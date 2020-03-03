@@ -14,11 +14,15 @@ namespace autotest
         public string DeviceName;
         public string DataFiles;
         public string StartProperties;
+        public int titleCol, dataCol, dataRow;
         public outSource(string devname, string devid, string dataf)
         {
             DeviceName = devname;
             StartProperties = devid;
             DataFiles = dataf;
+            titleCol = default;
+            dataCol = default;
+            dataRow = default;
         }
         public int RequestData(int RequestTime, TextBox consoleOut)
         {
@@ -36,8 +40,12 @@ namespace autotest
         {
             string[] rs = ReadFile().Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
             if (rs.Length > 5)
-                return rs[5].Replace("\r", "").Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            else 
+            {
+                string[] result = rs[5].Replace("\r", "").Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                titleCol = result.Length;
+                return result;
+            }
+            else
             {
                 rs[0] = "notitle";
                 return rs;
@@ -53,9 +61,14 @@ namespace autotest
                 int tabLen = rs[7].Length / colCount;
                 for (int i = nstr; i < rs.Length - 7; i++)
                 {
-                    //ws = rs[6 + i].Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
+                    dataRow = i+1;
                     for (int j = 0; j < rs[7 + i].Length / tabLen; j++)
-                        rdata[i, j] = rs[7 + i].Substring(j * tabLen, tabLen).Replace(" ", "").Replace("\r", "");
+                    {
+                        dataCol = rs[7 + i].Length / tabLen;
+                        rdata[i, j] = rs[7 + i].Substring(j * tabLen, tabLen).Trim(' ', '\r');
+                        // Заменяем точки на запятые, кроме полей даты и времени
+                        if (j > 1) rdata[i, j] = rdata[i, j].Replace('.', ',');
+                    }
                 }
                 return rdata;
             }

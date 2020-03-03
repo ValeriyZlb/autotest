@@ -47,6 +47,7 @@
             this.console_textBox.Location = new System.Drawing.Point(12, 12);
             this.console_textBox.Multiline = true;
             this.console_textBox.Name = "console_textBox";
+            this.console_textBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.console_textBox.Size = new System.Drawing.Size(776, 305);
             this.console_textBox.TabIndex = 1;
             // 

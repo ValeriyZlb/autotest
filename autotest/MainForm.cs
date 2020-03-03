@@ -31,7 +31,7 @@ namespace autotest
                                @"C:\Users\Valera\Desktop\Test\ДЕ.txt"};
 
             string[] SpnetStartParam = { "327", "328", "329", "330", "331" };
-            string[] Devices = { "Газ", "Газ (техн)", "Вода", "ПТВМ", "ДЕ" };
+            string[] Devices = { "СПГ761 (Газ)", "СПГ761.2(Газ (техн))", "СПТ961(Вода)", "СПТ961(ПТВМ)", "СПТ961(ДЕ)" };
 
             for (int i = 0; i < 5; i++)
                 dev[i] = new outSource(Devices[i], SpnetStartParam[i], files[i]);
@@ -40,23 +40,14 @@ namespace autotest
             string[][,] data = new string[5][,];
             for (int i = 0; i < 5; i++)
             {
-                int a = dev[i].RequestData(-1, console_textBox);
+                //int a = dev[i].RequestData(-1, console_textBox);
                 title[i] = dev[i].ReadTitle();
                 data[i] = dev[i].ReadData(0, 24);
-            }
-            /*
-            WorkFiles wf = new WorkFiles();
+                if (title[i][0] != "notitle") console_textBox.AppendText(DateTime.Now + " " + dev[i].DeviceName + " > Заголовок получен\r\n");
+                else console_textBox.AppendText(DateTime.Now + " " + dev[i].DeviceName + " > Error: пустой заголовок\r\n");
 
-            string[][,] lalala = new string[files.Length][,];
-            for (int i = 0; i < 5; i++)
-            {
-                lalala[i] = wf.ReadData(files[i], out strCount);
-                strCnt[i] = strCount;
-                MessageBox.Show(strCount.ToString());
-                if (lalala[i][0,0] == "error")
-                {
-                    console_textBox.AppendText("Ошибка: данные с прибора " + Devices[i] + " не полученны.\r\n");
-                }
+                if (data[i] != null) console_textBox.AppendText(DateTime.Now + " " + dev[i].DeviceName + " > Полученны данные (" + (dev[i].dataRow).ToString() + " из 24)\r\n");
+                else console_textBox.AppendText(DateTime.Now + " " + dev[i].DeviceName + " > Error:  Данные отстутствуют\r\n");
             }
 
             //Объявляем приложение
@@ -70,22 +61,19 @@ namespace autotest
                               Type.Missing, Type.Missing);
 
             //Отключить отображение окон с сообщениями
-            ex.DisplayAlerts = false;
+            ex.DisplayAlerts = true;
             //Получаем первый лист документа (счет начинается с 1)
             Excel.Worksheet sheet = (Excel.Worksheet)ex.Worksheets.get_Item(1);
 
             // Выводим содержимое массива с данными на первой страничке, один за другим, через строку
-            for (int i = 0; i < files.Length; i++)
+            for (int i = 0; i < 5; i++)
             {
-                sheet.Cells[i * 27 + 1, 1] = files[i];
-                if (lalala[i][0,0] != "error")
-                {
-                    Excel.Range rng = sheet.Range[sheet.Cells[i * 27 + 2, 1], sheet.Cells[i * 27 + strCnt[i]+1, lalala[i].Length / strCnt[i]]];
-                    rng.Value = lalala[i];
-                }
+                sheet.Cells[i * 27 + 1, 1] = dev[i].DataFiles;
+                Excel.Range rngTitle = sheet.Range[sheet.Cells[i * 27 + 2, 1], sheet.Cells[i * 27 + 2, dev[i].titleCol]];
+                Excel.Range rngData = sheet.Range[sheet.Cells[i * 27 + 3, 1], sheet.Cells[i * 27 + dev[i].dataRow + 2, dev[i].dataCol]];
+                rngTitle.Value = title[i];
+                rngData.Value = data[i];
             }
-            */
-
         }
     }
 }
