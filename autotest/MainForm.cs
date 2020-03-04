@@ -16,7 +16,8 @@ namespace autotest
 {
     public partial class MainForm : Form
     {
-        outSource[] dev = new outSource[5];
+        SPDevices[] Devices = new SPDevices[5];
+        SPData[] DevData = new SPData[5];
         public MainForm()
         {
             InitializeComponent();
@@ -30,24 +31,27 @@ namespace autotest
                                @"C:\Users\Valera\Desktop\Test\ПТВМ.txt",
                                @"C:\Users\Valera\Desktop\Test\ДЕ.txt"};
 
-            string[] SpnetStartParam = { "327", "328", "329", "330", "331" };
-            string[] Devices = { "СПГ761 (Газ)", "СПГ761.2(Газ (техн))", "СПТ961(Вода)", "СПТ961(ПТВМ)", "СПТ961(ДЕ)" };
+            string[] DevicesID = { "327", "328", "329", "330", "331" };
+            string[] DeviceNames = { "СПГ761 (Газ)", "СПГ761.2(Газ (техн))", "СПТ961(Вода)", "СПТ961(ПТВМ)", "СПТ961(ДЕ)" };
 
             for (int i = 0; i < 5; i++)
-                dev[i] = new outSource(Devices[i], SpnetStartParam[i], files[i]);
+            {
+                Devices[i] = new SPDevices(DeviceNames[i], DevicesID[i]);
+                DevData[i] = new SPData(files[i]);
+            }
 
             string[][] title = new string[5][];
             string[][,] data = new string[5][,];
             for (int i = 0; i < 5; i++)
             {
-                //int a = dev[i].RequestData(-1, console_textBox);
-                title[i] = dev[i].ReadTitle();
-                data[i] = dev[i].ReadData(0, 24);
-                if (title[i][0] != "notitle") console_textBox.AppendText(DateTime.Now + " " + dev[i].DeviceName + " > Заголовок получен\r\n");
-                else console_textBox.AppendText(DateTime.Now + " " + dev[i].DeviceName + " > Error: пустой заголовок\r\n");
+                //int a = Devices[i].RequestData(-1, console_textBox);
+                title[i] = DevData[i].ReadTitle();
+                data[i] = DevData[i].ReadData(0, 24);
+                if (title[i][0] != "notitle") console_textBox.AppendText(DateTime.Now + " " + Devices[i].DeviceName + " > Заголовок получен\r\n");
+                else console_textBox.AppendText(DateTime.Now + " " + Devices[i].DeviceName + " > Error: пустой заголовок\r\n");
 
-                if (data[i] != null) console_textBox.AppendText(DateTime.Now + " " + dev[i].DeviceName + " > Полученны данные (" + (dev[i].dataRow).ToString() + " из 24)\r\n");
-                else console_textBox.AppendText(DateTime.Now + " " + dev[i].DeviceName + " > Error:  Данные отстутствуют\r\n");
+                if (data[i] != null) console_textBox.AppendText(DateTime.Now + " " + Devices[i].DeviceName + " > Полученны данные (" + (DevData[i].dataRow).ToString() + " из 24)\r\n");
+                else console_textBox.AppendText(DateTime.Now + " " + Devices[i].DeviceName + " > Error:  Данные отстутствуют\r\n");
             }
 
             //Объявляем приложение
@@ -68,9 +72,9 @@ namespace autotest
             // Выводим содержимое массива с данными на первой страничке, один за другим, через строку
             for (int i = 0; i < 5; i++)
             {
-                sheet.Cells[i * 27 + 1, 1] = dev[i].DataFiles;
-                Excel.Range rngTitle = sheet.Range[sheet.Cells[i * 27 + 2, 1], sheet.Cells[i * 27 + 2, dev[i].titleCol]];
-                Excel.Range rngData = sheet.Range[sheet.Cells[i * 27 + 3, 1], sheet.Cells[i * 27 + dev[i].dataRow + 2, dev[i].dataCol]];
+                sheet.Cells[i * 27 + 1, 1] = DevData[i].DataFiles;
+                Excel.Range rngTitle = sheet.Range[sheet.Cells[i * 27 + 2, 1], sheet.Cells[i * 27 + 2, DevData[i].titleCol]];
+                Excel.Range rngData = sheet.Range[sheet.Cells[i * 27 + 3, 1], sheet.Cells[i * 27 + DevData[i].dataRow + 2, DevData[i].dataCol]];
                 rngTitle.Value = title[i];
                 rngData.Value = data[i];
             }
