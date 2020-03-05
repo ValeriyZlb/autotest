@@ -40,17 +40,13 @@ namespace autotest
                 DevData[i] = new SPData(files[i]);
             }
 
-            string[][] title = new string[5][];
             string[][,] data = new string[5][,];
             for (int i = 0; i < 5; i++)
             {
                 //int a = Devices[i].RequestData(-1, console_textBox);
-                title[i] = DevData[i].ReadTitle();
-                data[i] = DevData[i].ReadData(0, 24);
-                if (title[i][0] != "notitle") console_textBox.AppendText(DateTime.Now + " " + Devices[i].DeviceName + " > Заголовок получен\r\n");
-                else console_textBox.AppendText(DateTime.Now + " " + Devices[i].DeviceName + " > Error: пустой заголовок\r\n");
-
-                if (data[i] != null) console_textBox.AppendText(DateTime.Now + " " + Devices[i].DeviceName + " > Полученны данные (" + (DevData[i].dataRow).ToString() + " из 24)\r\n");
+                data[i] = DevData[i].ReadData();
+            
+                if (data[i] != null) console_textBox.AppendText(DateTime.Now + " " + Devices[i].DeviceName + " > Полученны данные (" + (DevData[i].RowCout).ToString() + " из 24)\r\n");
                 else console_textBox.AppendText(DateTime.Now + " " + Devices[i].DeviceName + " > Error:  Данные отстутствуют\r\n");
             }
 
@@ -73,11 +69,15 @@ namespace autotest
             for (int i = 0; i < 5; i++)
             {
                 sheet.Cells[i * 27 + 1, 1] = DevData[i].DataFiles;
-                Excel.Range rngTitle = sheet.Range[sheet.Cells[i * 27 + 2, 1], sheet.Cells[i * 27 + 2, DevData[i].titleCol]];
-                Excel.Range rngData = sheet.Range[sheet.Cells[i * 27 + 3, 1], sheet.Cells[i * 27 + DevData[i].dataRow + 2, DevData[i].dataCol]];
-                rngTitle.Value = title[i];
+                Excel.Range rngData = sheet.Range[sheet.Cells[i * 27 + 2, 1], sheet.Cells[i * 27 + DevData[i].RowCout + 2, DevData[i].ColCount]];
                 rngData.Value = data[i];
             }
+        }
+
+        private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Settings frm = new Settings();
+            frm.ShowDialog();
         }
     }
 }
